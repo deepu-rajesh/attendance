@@ -1,0 +1,25 @@
+# Python / Django
+__pycache__/
+*.py[cod]
+*$py.class
+*.sqlite3
+db.sqlite3
+.env
+venv/
+env/
+.venv/
+ENV/
+
+# OS / Editor
+.vscode/
+.idea/
+.DS_Store
+*.swp
+*.swo
+*~
+
+# Frontend (Angular/Node)
+node_modules/
+dist/
+.angular/
+coverage/

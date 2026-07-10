@@ -1,0 +1,118 @@
+<div class="p-4">
+  <div class="flex justify-between items-center mb-4">
+    <h1 style="font-size: 1.5rem; font-weight: 600;">Admin Portal</h1>
+    <div class="flex gap-4">
+      <button class="btn btn-primary" (click)="loadData()">Refresh Data</button>
+      <button class="btn btn-danger" (click)="logout()">Logout</button>
+    </div>
+  </div>
+
+  <!-- Tabs Navigation -->
+  <div class="tabs mb-4 flex gap-4" style="border-bottom: 1px solid var(--panel-border); padding-bottom: 10px;">
+    <button class="btn" [ngStyle]="{'opacity': activeTab === 'users' ? '1' : '0.6'}" (click)="activeTab = 'users'">Users</button>
+    <button class="btn" [ngStyle]="{'opacity': activeTab === 'leave_types' ? '1' : '0.6'}" (click)="activeTab = 'leave_types'">Leave Types</button>
+    <button class="btn" [ngStyle]="{'opacity': activeTab === 'reports' ? '1' : '0.6'}" (click)="activeTab = 'reports'">Reports</button>
+  </div>
+
+  <div class="flex gap-4">
+    <div *ngIf="activeTab === 'users'" style="flex: 1; display: flex; flex-direction: column; gap: 1rem;">
+      <div class="glass-panel w-full">
+        <h2 class="mb-4">System Users</h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let user of users">
+                <td>{{ user.username }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.role | uppercase }}</td>
+                <td>
+                  <span [ngClass]="{'text-success': user.is_active, 'text-danger': !user.is_active}">
+                    {{ user.is_active ? 'Active' : 'Disabled' }}
+                  </span>
+                </td>
+                <td>
+                  <button class="btn" [ngClass]="{'btn-danger': user.is_active, 'btn-success': !user.is_active}" style="padding: 4px 8px; font-size: 0.8rem;" (click)="toggleUserStatus(user.id)">
+                    {{ user.is_active ? 'Disable' : 'Enable' }}
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="activeTab === 'leave_types'" style="flex: 1; display: flex; flex-direction: column; gap: 1rem;">
+      <div class="glass-panel w-full">
+        <h2 class="mb-4">Leave Types</h2>
+        
+        <div class="flex gap-4 mb-4 items-center">
+          <input type="text" [(ngModel)]="newLeaveTypeName" class="form-control flex-1" placeholder="Enter new leave type name (e.g. Sick Leave)">
+          <button class="btn btn-primary" (click)="addLeaveType()" [disabled]="!newLeaveTypeName.trim()">Add Leave Type</button>
+        </div>
+
+        <div class="table-container mt-4">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th style="width: 80px;">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let lt of leaveTypes">
+                <td>{{ lt.name }}</td>
+                <td>
+                  <button class="btn btn-danger" style="padding: 4px 8px; font-size: 0.8rem;" (click)="deleteLeaveType(lt.id)">Delete</button>
+                </td>
+              </tr>
+              <tr *ngIf="leaveTypes.length === 0">
+                <td colspan="2" class="text-center" style="opacity: 0.6; padding: 1rem;">No leave types defined.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="activeTab === 'reports'" style="flex: 1; display: flex; flex-direction: column; gap: 1rem;">
+      <div class="glass-panel w-full" style="max-width: 600px;">
+        <h2 class="mb-4">Generate PDF Report</h2>
+        <p class="mb-4" style="opacity: 0.8; font-size: 0.9rem;">
+          Generate a comprehensive PDF report containing user lists, attendance history, and leave history. 
+          Select an optional date range to filter the attendance and leave records.
+        </p>
+
+        <div class="flex gap-4 mb-4">
+          <div style="flex: 1;">
+            <label class="form-label">Start Date</label>
+            <input type="date" [(ngModel)]="reportStartDate" class="form-control">
+          </div>
+          <div style="flex: 1;">
+            <label class="form-label">End Date</label>
+            <input type="date" [(ngModel)]="reportEndDate" class="form-control">
+          </div>
+        </div>
+
+        <button class="btn btn-primary w-full" (click)="generateReport()">
+          <span style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+              <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+            </svg>
+            Download PDF Report
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

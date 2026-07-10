@@ -1,0 +1,117 @@
+<div class="p-4">
+  <div class="flex justify-between items-center mb-4">
+    <h1 style="font-size: 1.5rem; font-weight: 600;">Manager Portal</h1>
+    <button class="btn btn-danger" (click)="logout()">Logout</button>
+  </div>
+
+  <!-- Tabs Navigation -->
+  <div class="tabs mb-4 flex gap-4" style="border-bottom: 1px solid var(--panel-border); padding-bottom: 10px;">
+    <button class="btn" [ngStyle]="{'opacity': activeTab === 'attendance' ? '1' : '0.6'}" (click)="setActiveTab('attendance')">Attendance</button>
+    <button class="btn" [ngStyle]="{'opacity': activeTab === 'leave' ? '1' : '0.6'}" (click)="setActiveTab('leave')">Leave</button>
+    <button class="btn" [ngStyle]="{'opacity': activeTab === 'users' ? '1' : '0.6'}" (click)="setActiveTab('users')">Users</button>
+  </div>
+
+  <!-- Tab Content: Attendance -->
+  <div *ngIf="activeTab === 'attendance'" class="glass-panel w-full">
+    <div class="flex justify-between items-center mb-4">
+      <h2>Team Attendance</h2>
+      <div class="flex items-center gap-2">
+        <label style="font-size: 0.9rem; opacity: 0.8;">Filter by Date:</label>
+        <input type="date" [(ngModel)]="filterDate" class="form-control" style="padding: 4px 8px;">
+        <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.8rem;" (click)="filterDate = ''" *ngIf="filterDate">Clear</button>
+      </div>
+    </div>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Employee</th>
+            <th>Date</th>
+            <th>Check In</th>
+            <th>Check Out</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let record of filteredAttendance">
+            <td>{{ record.employee.first_name }} {{ record.employee.last_name }}</td>
+            <td>{{ record.date }}</td>
+            <td>{{ record.check_in }}</td>
+            <td>{{ record.check_out || '--' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Tab Content: Leave -->
+  <div *ngIf="activeTab === 'leave'" class="glass-panel w-full">
+    <h2 class="mb-4">Leave Requests</h2>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Employee</th>
+            <th>Type</th>
+            <th>Dates</th>
+            <th>Status</th>
+            <th>Remarks</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let request of leaveRequests">
+            <td>{{ request.employee.first_name }} {{ request.employee.last_name }}</td>
+            <td>{{ request.leave_type_details?.name }}</td>
+            <td>{{ request.start_date }} to {{ request.end_date }}</td>
+            <td style="text-transform: capitalize;">{{ request.status }}</td>
+            <td>
+              <input *ngIf="request.status === 'pending'" type="text" [(ngModel)]="remarks[request.id]" placeholder="Add remarks..." style="padding: 4px; font-size: 0.8rem; background: var(--bg-color); border: 1px solid var(--panel-border); color: var(--text-main); border-radius: 4px; width: 150px;">
+              <span *ngIf="request.status !== 'pending'">{{ request.remarks || '--' }}</span>
+            </td>
+            <td>
+              <div class="flex gap-4" *ngIf="request.status === 'pending'">
+                <button class="btn btn-success" style="padding: 4px 8px; font-size: 0.8rem;" (click)="updateLeaveStatus(request.id, 'approved')">Approve</button>
+                <button class="btn btn-danger" style="padding: 4px 8px; font-size: 0.8rem;" (click)="updateLeaveStatus(request.id, 'rejected')">Reject</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Tab Content: Users -->
+  <div *ngIf="activeTab === 'users'" class="glass-panel w-full">
+    <h2 class="mb-4">User Management</h2>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of users">
+            <td>{{ user.first_name }} {{ user.last_name }}</td>
+            <td>{{ user.email }}</td>
+            <td style="text-transform: capitalize;">{{ user.role }}</td>
+            <td>
+              <span [ngClass]="{'text-success': user.is_active, 'text-danger': !user.is_active}">
+                {{ user.is_active ? 'Active' : 'Disabled' }}
+              </span>
+            </td>
+            <td>
+              <button class="btn" [ngClass]="{'btn-danger': user.is_active, 'btn-success': !user.is_active}" style="padding: 4px 8px; font-size: 0.8rem;" (click)="toggleUserStatus(user.id)">
+                {{ user.is_active ? 'Disable' : 'Enable' }}
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
